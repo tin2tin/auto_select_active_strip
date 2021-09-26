@@ -4,10 +4,10 @@ from operator import attrgetter
 
 
 def auto_select_active_strip(scene):
-    current_frame = bpy.context.scene.frame_current
     screen = bpy.context.screen
     if screen.is_animation_playing:
         return
+    current_frame = bpy.context.scene.frame_current
     bpy.ops.sequencer.select_all(action="DESELECT")
     strips = bpy.context.sequences
     strips = sorted(strips, key=attrgetter("channel", "frame_final_start"))
