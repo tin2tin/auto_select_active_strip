@@ -5,7 +5,9 @@ from operator import attrgetter
 
 def auto_select_active_strip(scene):
     current_frame = bpy.context.scene.frame_current
-    sel_strips = []
+    screen = bpy.context.screen
+    if screen.is_animation_playing:
+        return
     bpy.ops.sequencer.select_all(action="DESELECT")
     strips = bpy.context.sequences
     strips = sorted(strips, key=attrgetter("channel", "frame_final_start"))
@@ -15,10 +17,19 @@ def auto_select_active_strip(scene):
             and strip.frame_final_end >= current_frame
             and strip.frame_final_start <= current_frame
         ):
+            # Select handles.
+            if (
+                strip.frame_final_end >= current_frame
+                and strip.frame_final_end - 8 <= current_frame
+            ):
+                strip.select_right_handle = True
+            elif (
+                strip.frame_final_start <= current_frame
+                and strip.frame_final_start + 8 >= current_frame
+            ):
+                strip.select_left_handle = True
             strip.select = True
-            sel_strips.append(strip)
-    if sel_strips != []:
-        bpy.context.scene.sequence_editor.active_strip = sel_strips[len(sel_strips)]
+            bpy.context.scene.sequence_editor.active_strip = strip
 
 
 def register():
