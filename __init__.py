@@ -86,7 +86,7 @@ def menu_auto_select(self, context):
     self.layout.prop(manager, "auto_select_toggle")
 
 
-classes = (PropertyGroup)
+classes = (PropertyGroup,)
 
 
 def register():
