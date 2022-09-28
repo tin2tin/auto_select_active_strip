@@ -6,12 +6,12 @@ Donwload this: https://github.com/tin2tin/auto_select_active_strip/archive/refs/
 
 # Find it here:
 Menu: Sequencer > Select > Auto-Select
+
 Panel: Sidebar(N) > Tool > Auto Select
 
 # Auto-selection while playing(for ex. color grading):
 ![alt text](https://github.com/tin2tin/auto_select_active_strip/blob/main/auto_select.gif?raw=true)
 
-https://github.com/tin2tin/auto_select_active_strip/blob/main/auto_select.gif?raw=true
 
 # Quick trim without manual selection:
 ![alt text](https://github.com/tin2tin/auto_select_active_strip/blob/main/auto_select_trim.gif?raw=true)
