@@ -19,7 +19,7 @@
 bl_info = {
     "name": "Auto-select strips under the playhead",
     "author": "Tintwotin, Samuel Bernou",
-    "version": (1, 1),
+    "version": (1, 2),
     "blender": (2, 90, 0),
     "location": "Sequencer > Select > Auto-Select",
     "description": "Auto-selects strips under the playhead.",
@@ -28,6 +28,7 @@ bl_info = {
     "category": "Sequencer",
 }
 
+from bpy.app.handlers import persistent
 from bpy.types import (
     Operator,
     PropertyGroup,
@@ -68,7 +69,7 @@ class PropertyGroup(bpy.types.PropertyGroup):
     description='Restrict selection to this channel', default=1)
     
 
-
+@persistent
 def auto_select_active_strip(scene):
     # print(bpy.context.scene.auto_select_strip.auto_select_toggle)
     if bpy.context.scene.auto_select_strip.auto_select_toggle == False:
@@ -147,18 +148,20 @@ classes = (
 def register():
     for cls in classes:
         bpy.utils.register_class(cls)
+    bpy.types.Scene.auto_select_strip = PointerProperty(type=PropertyGroup)
     bpy.types.SEQUENCER_MT_context_menu.append(menu_auto_select)
     bpy.types.SEQUENCER_MT_select.append(menu_auto_select)
     bpy.app.handlers.frame_change_post.append(auto_select_active_strip)
-    bpy.types.Scene.auto_select_strip = PointerProperty(type=PropertyGroup)
 
 
 def unregister():
-    for cls in reversed(classes):
-        bpy.utils.unregister_class(cls)
+    
+    del bpy.types.Scene.auto_select_strip
     bpy.types.SEQUENCER_MT_context_menu.remove(menu_auto_select)
     bpy.types.SEQUENCER_MT_select.remove(menu_auto_select)
     bpy.app.handlers.frame_change_post.remove(auto_select_active_strip)
+    for cls in reversed(classes):
+        bpy.utils.unregister_class(cls)
 
 
 if __name__ == "__main__":
