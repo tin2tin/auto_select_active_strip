@@ -21,7 +21,7 @@ bl_info = {
     "author": "Tintwotin, Samuel Bernou",
     "version": (1, 2),
     "blender": (2, 90, 0),
-    "location": "Sequencer > Select > Auto-Select",
+    "location": "Sequencer > Select > Auto-Select, Sidebar > Auto Select, Right side of Header & Context Menu",
     "description": "Auto-selects strips under the playhead.",
     "warning": "",
     "doc_url": "",
@@ -48,12 +48,6 @@ class PropertyGroup(bpy.types.PropertyGroup):
     auto_select_toggle: BoolProperty(
         name="Auto Select", description="Auto-Selects Strips under playhead"
     )
-    
-    select_while_playing: BoolProperty(name='Select While Playing',
-    description='Selection is still active during playback', default=True)
-
-    select_handles: BoolProperty(name='Select Handles',
-    description='Selectable handles', default=True)
 
     select_mode: EnumProperty(
         name="Select",
@@ -67,6 +61,12 @@ class PropertyGroup(bpy.types.PropertyGroup):
 
     channel: IntProperty(name='Channel',
     description='Restrict selection to this channel', default=1)
+
+    select_while_playing: BoolProperty(name='While Playing',
+    description='Selection is still active during playback', default=True)
+
+    select_handles: BoolProperty(name='Handles',
+    description='Selectable handles', default=True)
     
 
 @persistent
@@ -118,6 +118,7 @@ class SEQUENCER_PT_auto_select_ui(bpy.types.Panel):
     bl_region_type = "UI"
     bl_category = "Tool"
 
+
     def draw_header(self, context):
         self.layout.prop(context.scene.auto_select_strip, "auto_select_toggle",
         text="") # , icon='RESTRICT_SELECT_OFF'
@@ -125,18 +126,23 @@ class SEQUENCER_PT_auto_select_ui(bpy.types.Panel):
     def draw(self, context):
         settings = context.scene.auto_select_strip
         layout = self.layout
+        layout.use_property_split = True
+        layout.use_property_decorate = False
         col = layout.column()
+        col.prop(settings, 'select_mode')
+        col_sub = col.column()
+        col_sub.prop(settings, 'channel')
         col.prop(settings, 'select_handles')
         col.prop(settings, 'select_while_playing')
-        col.prop(settings, 'select_mode')
-        if settings.select_mode == 'CHANNEL':
-            col.prop(settings, 'channel')
+        col.enabled = context.scene.auto_select_strip.auto_select_toggle
+        col_sub.enabled = (settings.select_mode == 'CHANNEL')
         
 
 def menu_auto_select(self, context):
     manager = context.scene.auto_select_strip
     self.layout.separator()
-    self.layout.prop(manager, "auto_select_toggle")
+    self.layout.popover(panel="SEQUENCER_PT_auto_select_ui")
+    #self.layout.prop(manager, "auto_select_toggle")
 
 
 classes = (
@@ -151,6 +157,7 @@ def register():
     bpy.types.Scene.auto_select_strip = PointerProperty(type=PropertyGroup)
     bpy.types.SEQUENCER_MT_context_menu.append(menu_auto_select)
     bpy.types.SEQUENCER_MT_select.append(menu_auto_select)
+    bpy.types.SEQUENCER_HT_header.append(menu_auto_select) 
     bpy.app.handlers.frame_change_post.append(auto_select_active_strip)
 
 
@@ -159,6 +166,7 @@ def unregister():
     del bpy.types.Scene.auto_select_strip
     bpy.types.SEQUENCER_MT_context_menu.remove(menu_auto_select)
     bpy.types.SEQUENCER_MT_select.remove(menu_auto_select)
+    bpy.types.SEQUENCER_HT_header.remove(menu_auto_select)
     bpy.app.handlers.frame_change_post.remove(auto_select_active_strip)
     for cls in reversed(classes):
         bpy.utils.unregister_class(cls)
