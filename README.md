@@ -10,6 +10,8 @@ Download this: https://github.com/tin2tin/auto_select_active_strip/archive/refs/
 
 Header: Toggle and Pop-over at right side of header
 
+![alt text](https://github.com/tin2tin/auto_select_active_strip/blob/main/auto_select.png?raw=true)
+
 <!-- Menu: Sequencer > Select > Auto-Select -->
 
 <!-- Panel: Sidebar(N) > Tool > Auto Select -->
