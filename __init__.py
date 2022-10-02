@@ -1,41 +1,24 @@
-# ##### BEGIN GPL LICENSE BLOCK #####
-#
-#  This program is free software; you can redistribute it and/or
-#  modify it under the terms of the GNU General Public License
-#  as published by the Free Software Foundation; either version 2
-#  of the License, or (at your option) any later version.
-#
-#  This program is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#  GNU General Public License for more details.
-#
-#  You should have received a copy of the GNU General Public License
-#  along with this program; if not, write to the Free Software Foundation,
-#  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
-#
-# ##### END GPL LICENSE BLOCK #####
+# SPDX-License-Identifier: GPL-2.0-or-later
 
 bl_info = {
     "name": "Auto-select strips under the playhead",
     "author": "Tintwotin, Samuel Bernou",
-    "version": (1, 2),
+    "version": (1, 3),
     "blender": (2, 90, 0),
     "location": "Sequencer > Select > Auto-Select & Sidebar > Auto Select",
     "description": "Auto-selects strips under the playhead.",
     "warning": "",
-    "doc_url": "",
+    "doc_url": "https://github.com/tin2tin/auto_select_active_strip",
     "category": "Sequencer",
 }
 
+import bpy
 from bpy.app.handlers import persistent
+from operator import attrgetter
 from bpy.types import (
-    Operator,
+    Panel,
     PropertyGroup,
 )
-import bpy
-import datetime
-from operator import attrgetter
 from bpy.props import (
     BoolProperty,
     EnumProperty,
@@ -43,8 +26,7 @@ from bpy.props import (
     PointerProperty,
 )
 
-
-class PropertyGroup(bpy.types.PropertyGroup):
+class autoselect_property_group(PropertyGroup):
     auto_select_toggle: BoolProperty(
         name="Auto Select", description="Auto-Selects Strips under playhead"
     )
@@ -67,7 +49,7 @@ class PropertyGroup(bpy.types.PropertyGroup):
 
     select_handles: BoolProperty(name='Handles',
     description='Selectable handles', default=True)
-    
+
 
 @persistent
 def auto_select_active_strip(scene):
@@ -112,16 +94,19 @@ def auto_select_active_strip(scene):
             if settings.select_mode == 'TOP':
                 break
 
-class SEQUENCER_PT_auto_select_ui(bpy.types.Panel):
+class SEQUENCER_PT_auto_select_ui(Panel):
     bl_label = "Auto Select"
     bl_space_type = "SEQUENCE_EDITOR"
     bl_region_type = "UI"
     bl_category = "Tool"
 
-
     def draw_header(self, context):
-        self.layout.prop(context.scene.auto_select_strip, "auto_select_toggle",
-        text="") # , icon='RESTRICT_SELECT_OFF'
+        settings = context.scene.auto_select_strip
+        if context.region.type == 'HEADER':
+            ico = 'RESTRICT_SELECT_OFF' if settings.auto_select_toggle else 'RESTRICT_SELECT_ON'
+            self.layout.prop(settings, "auto_select_toggle", text="", icon=ico)
+        else:
+            self.layout.prop(settings, "auto_select_toggle", text="")
 
     def draw(self, context):
         settings = context.scene.auto_select_strip
@@ -136,17 +121,17 @@ class SEQUENCER_PT_auto_select_ui(bpy.types.Panel):
         col.prop(settings, 'select_while_playing')
         col.enabled = context.scene.auto_select_strip.auto_select_toggle
         col_sub.enabled = (settings.select_mode == 'CHANNEL')
-        
+
 
 def menu_auto_select(self, context):
-    manager = context.scene.auto_select_strip
     self.layout.separator()
     self.layout.popover(panel="SEQUENCER_PT_auto_select_ui")
+    # manager = context.scene.auto_select_strip
     #self.layout.prop(manager, "auto_select_toggle")
 
 
 classes = (
-    PropertyGroup,
+    autoselect_property_group,
     SEQUENCER_PT_auto_select_ui,
     )
 
@@ -154,7 +139,7 @@ classes = (
 def register():
     for cls in classes:
         bpy.utils.register_class(cls)
-    bpy.types.Scene.auto_select_strip = PointerProperty(type=PropertyGroup)
+    bpy.types.Scene.auto_select_strip = PointerProperty(type=autoselect_property_group)
     bpy.types.SEQUENCER_MT_context_menu.append(menu_auto_select)
     bpy.types.SEQUENCER_MT_select.append(menu_auto_select)
     bpy.types.SEQUENCER_HT_header.append(menu_auto_select) 
@@ -162,7 +147,7 @@ def register():
 
 
 def unregister():
-    
+
     del bpy.types.Scene.auto_select_strip
     bpy.types.SEQUENCER_MT_context_menu.remove(menu_auto_select)
     bpy.types.SEQUENCER_MT_select.remove(menu_auto_select)
