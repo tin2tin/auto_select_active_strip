@@ -8,11 +8,11 @@ Download this: https://github.com/tin2tin/auto_select_active_strip/archive/refs/
 
 ## Find it here
 
-Header: Right side of header
+Header: Toggle and Pop-over at right side of header
 
-Menu: Sequencer > Select > Auto-Select
+<!-- Menu: Sequencer > Select > Auto-Select -->
 
-Panel: Sidebar(N) > Tool > Auto Select
+<!-- Panel: Sidebar(N) > Tool > Auto Select -->
 
 ## Auto-selection while playing(for ex. color grading)
 
