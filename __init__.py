@@ -3,7 +3,7 @@
 bl_info = {
     "name": "Auto-select strips under the playhead",
     "author": "Tintwotin, Samuel Bernou",
-    "version": (1, 3),
+    "version": (1, 4),
     "blender": (2, 90, 0),
     "location": "Sequencer > Select > Auto-Select & Sidebar > Auto Select",
     "description": "Auto-selects strips under the playhead.",
@@ -53,7 +53,6 @@ class autoselect_property_group(PropertyGroup):
 
 @persistent
 def auto_select_active_strip(scene):
-    # print(bpy.context.scene.auto_select_strip.auto_select_toggle)
     if bpy.context.scene.auto_select_strip.auto_select_toggle == False:
         return
     settings = bpy.context.scene.auto_select_strip
@@ -99,14 +98,12 @@ class SEQUENCER_PT_auto_select_ui(Panel):
     bl_space_type = "SEQUENCE_EDITOR"
     bl_region_type = "UI"
     bl_category = "Tool"
+    bl_options = {"INSTANCED"}
 
     def draw_header(self, context):
         settings = context.scene.auto_select_strip
-        if context.region.type == 'HEADER':
-            ico = 'RESTRICT_SELECT_OFF' if settings.auto_select_toggle else 'RESTRICT_SELECT_ON'
-            self.layout.prop(settings, "auto_select_toggle", text="", icon=ico)
-        else:
-            self.layout.prop(settings, "auto_select_toggle", text="")
+        ico = 'RESTRICT_SELECT_OFF' if settings.auto_select_toggle else 'RESTRICT_SELECT_ON'
+        self.layout.prop(settings, "auto_select_toggle", text="", icon=ico)
 
     def draw(self, context):
         settings = context.scene.auto_select_strip
@@ -140,8 +137,8 @@ def register():
     for cls in classes:
         bpy.utils.register_class(cls)
     bpy.types.Scene.auto_select_strip = PointerProperty(type=autoselect_property_group)
-    bpy.types.SEQUENCER_MT_context_menu.append(menu_auto_select)
-    bpy.types.SEQUENCER_MT_select.append(menu_auto_select)
+    # bpy.types.SEQUENCER_MT_context_menu.append(menu_auto_select)
+    # bpy.types.SEQUENCER_MT_select.append(menu_auto_select)
     bpy.types.SEQUENCER_HT_header.append(menu_auto_select) 
     bpy.app.handlers.frame_change_post.append(auto_select_active_strip)
 
@@ -149,8 +146,8 @@ def register():
 def unregister():
 
     del bpy.types.Scene.auto_select_strip
-    bpy.types.SEQUENCER_MT_context_menu.remove(menu_auto_select)
-    bpy.types.SEQUENCER_MT_select.remove(menu_auto_select)
+    # bpy.types.SEQUENCER_MT_context_menu.remove(menu_auto_select)
+    # bpy.types.SEQUENCER_MT_select.remove(menu_auto_select)
     bpy.types.SEQUENCER_HT_header.remove(menu_auto_select)
     bpy.app.handlers.frame_change_post.remove(auto_select_active_strip)
     for cls in reversed(classes):
