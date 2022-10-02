@@ -21,7 +21,7 @@ bl_info = {
     "author": "Tintwotin, Samuel Bernou",
     "version": (1, 2),
     "blender": (2, 90, 0),
-    "location": "Sequencer > Select > Auto-Select, Sidebar > Auto Select, Right side of Header & Context Menu",
+    "location": "Sequencer > Select > Auto-Select & Sidebar > Auto Select",
     "description": "Auto-selects strips under the playhead.",
     "warning": "",
     "doc_url": "",
@@ -128,7 +128,7 @@ class SEQUENCER_PT_auto_select_ui(bpy.types.Panel):
         layout = self.layout
         layout.use_property_split = True
         layout.use_property_decorate = False
-        col = layout.column()
+        col = layout.column(align=True)
         col.prop(settings, 'select_mode')
         col_sub = col.column()
         col_sub.prop(settings, 'channel')
